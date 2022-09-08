@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\lithin.damodaran\\Downloads\\MySqlJdbcDriver\\mysql-connector-java-8.0.29.jar"
+    ]
+}
