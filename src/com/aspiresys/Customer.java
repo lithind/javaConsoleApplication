@@ -29,20 +29,35 @@ public class Customer {
             System.out.format(format1,resultSet.getString(1));
 
         }
+
         System.out.format(format1, "----------");
         System.out.println();
-        System.out.println("Select category which you need ....");
-        String category=scanner.next();
-        String format2 = "| %-10s | %-10s |\n";
-        System.out.format(format2, "----------","----------");
-        System.out.format(format2, "Item Name","Price");
-        System.out.format(format2, "----------","----------");
-        ResultSet resultSet2 = statement.executeQuery("select * from menu where category='"+category+"';");
-        while(resultSet2.next())
+        while(true)
         {
-            System.out.format(format2,resultSet2.getString(1),resultSet2.getString(3));
+            System.out.println("Select category which you need ....");
+            String category=scanner.next();
+            resultSet = statement.executeQuery("select category from menu where category='"+category+"';");
+            if(resultSet.next())
+            {
+                String format2 = "| %-10s | %-10s |\n";
+                System.out.format(format2, "----------","----------");
+                System.out.format(format2, "Item Name","Price");
+                System.out.format(format2, "----------","----------");
+                ResultSet resultSet2 = statement.executeQuery("select * from menu where category='"+category+"';");
+                while(resultSet2.next())
+                {
+                    System.out.format(format2,resultSet2.getString(1),resultSet2.getString(3));
+                }
+                System.out.format(format2, "----------","----------");
+                break;
+            }
+            else
+            {
+                System.out.println("Invalid Category !!!");
+
+            }
         }
-        System.out.format(format2, "----------","----------");
+
         databaseConnection.closeConnection(connection,statement);
         System.out.println();
     }
@@ -78,6 +93,8 @@ public class Customer {
         try {
             DatabaseConnection databaseConnection = new DatabaseConnection("jdbc:mysql://localhost:3306/digicafe", "root", "Aspire@1");
             Connection connection = databaseConnection.getConnection();
+            Statement statement= connection.createStatement();
+
             System.out.println("----------------------------");
             System.out.println("        Order an item        ");
             System.out.println("----------------------------");
@@ -87,7 +104,7 @@ public class Customer {
             String tableNumber ;
             String quantity;
 
-            List<MenuItem> orderList=new ArrayList<MenuItem>();
+            List<MenuItem> orderList=new ArrayList<MenuItem>(); //ArrayList 
             
             while(true)
             {
@@ -110,47 +127,55 @@ public class Customer {
                 System.out.println("Item name : ");
                 String name = scanner.next();
                 
-
-                while(true)
+                ResultSet resultSet = statement.executeQuery("select * from menu where name='"+name+"';");
+                if(resultSet.next())
                 {
-                    System.out.println("Quantity : ");
-                    quantity = scanner.next();
-                    if(Pattern.matches("[0-9]*",quantity))
+                    while(true)
                     {
-                        break;
-
+                        System.out.println("Quantity : ");
+                        quantity = scanner.next();
+                        if(Pattern.matches("[0-9]*",quantity))
+                        {
+                            break;
+    
+                        }
+                        else{
+                            System.err.println("Enter valid quantity");
+    
+                        }
                     }
-                    else{
-                        System.err.println("Enter valid quantity");
-
+                    String query = "SELECT price FROM menu WHERE name= ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                    preparedStatement.setString(1, name);
+                    resultSet = preparedStatement.executeQuery();
+                    int price = 0;
+                    while (resultSet.next()) 
+                    {
+                        price = resultSet.getInt("price");
+    
                     }
-                }
-                String query = "SELECT price FROM menu WHERE name= ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setString(1, name);
-                ResultSet resultSet = preparedStatement.executeQuery();
-                int price = 0;
-                while (resultSet.next()) 
-                {
-                    price = resultSet.getInt("price");
+    
+                    int total = Integer.parseInt(quantity )* price;
+                    String sql = "insert into orders values(?,?,?,?,?);";
+                    preparedStatement = connection.prepareStatement(sql);
+                    preparedStatement.setString(1, tableNumber);
+                    preparedStatement.setString(2, quantity);
+                    preparedStatement.setString(3, name);
+                    preparedStatement.setInt(4, price);
+                    preparedStatement.setInt(5, total);
+    
+                    try {
+                        preparedStatement.executeUpdate();
+                        totalSum=totalSum+total;
+                        orderList.add(new MenuItem(name,price,quantity,total));//ArrayList Insertion
+                    } 
+                    catch (SQLException e) 
+                    {
+                        
+                    }
 
                 }
-
-                int total = Integer.parseInt(quantity )* price;
-                String sql = "insert into orders values(?,?,?,?,?);";
-                preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setString(1, tableNumber);
-                preparedStatement.setString(2, quantity);
-                preparedStatement.setString(3, name);
-                preparedStatement.setInt(4, price);
-                preparedStatement.setInt(5, total);
-
-                try {
-                    preparedStatement.executeUpdate();
-                    totalSum=totalSum+total;
-                    orderList.add(new MenuItem(name,price,quantity,total));
-                } 
-                catch (SQLException e) 
+                else
                 {
                     System.out.println("no such item in menu");
                     i=i-1;
@@ -200,3 +225,5 @@ public class Customer {
         }
     }
 }
+
+

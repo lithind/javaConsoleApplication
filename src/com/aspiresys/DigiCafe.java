@@ -1,10 +1,10 @@
 /*
 Title: Digi Cafe
 Author: Lithin D
-Created at: 
-Updated at: 05/09/2022
-Reviewed by:  
-Reviewed at: 
+Created on: 19/08/2022
+Updated on: 09/09/2022
+Reviewed by:  Naveen Subramaniam
+Reviewed on:09/09/2022 
 */
 package com.aspiresys;
 import java.io.Console;
@@ -12,6 +12,9 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class DigiCafe {
+
+
+    static Scanner scanner=new Scanner(System.in);
 
     public static String consoleFunc()
     {
@@ -35,7 +38,6 @@ public class DigiCafe {
         System.out.println("**************** CHOOSE AN OPTION ****************");
         System.out.println("\n1. Admin\n2. Customer");
         System.out.println();
-        Scanner scanner=new Scanner(System.in);
         int choice= scanner.nextInt();
         switch (choice)
         {
@@ -60,7 +62,6 @@ public class DigiCafe {
                     else
                     {
                         System.err.println("Invalid password or username");
-    
     
                     }
     

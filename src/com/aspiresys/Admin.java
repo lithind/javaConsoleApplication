@@ -132,19 +132,40 @@ public class Admin extends Customer {
      {
           DatabaseConnection databaseConnection=new DatabaseConnection("jdbc:mysql://localhost:3306/digicafe","root","Aspire@1");
           Connection connection=databaseConnection.getConnection();
+          Statement statement=connection.createStatement();
+          String getName="";
 
-          System.out.println("Enter item name to Update rate: ");
-          String name=scanner.next();          
-          System.out.println("Enter item's new price  : ");
-          int price=scanner.nextInt();
-          String query="update menu set price =? where name=?";
-          PreparedStatement preparedStatement=connection.prepareStatement(query);
-          preparedStatement.setInt(1, price);
-          preparedStatement.setString(2,name);
-          preparedStatement.executeUpdate();
-          System.out.println("Menu item price updated Successfully ! ");
-          showAdminHome();
-          databaseConnection.closeConnection(connection,preparedStatement);
+          while(true)
+          {
+               System.out.println("Enter item name to Update rate: ");
+               String name=scanner.next(); 
+               String CheckQuery="select name from menu where name='"+name+"'";
+               ResultSet resultSet = statement.executeQuery(CheckQuery);
+     
+               while(resultSet.next())
+               {
+                    getName = resultSet.getString("name");
+     
+               }
+               if(name.equals(getName))
+               {
+                    System.out.println("Enter item's new price  : ");
+                    int price=scanner.nextInt();
+                    String query="update menu set price =? where name=?";
+                    PreparedStatement preparedStatement=connection.prepareStatement(query);
+                    preparedStatement.setInt(1, price);
+                    preparedStatement.setString(2,name);
+                    preparedStatement.executeUpdate();
+                    System.out.println("Menu item price updated Successfully ! ");
+                    showAdminHome();
+                    databaseConnection.closeConnection(connection,preparedStatement);
+               }
+               else
+               {
+                    System.out.println("No such item in menu !!!");
+     
+               }
+          } 
      }
 
 
@@ -153,7 +174,7 @@ public class Admin extends Customer {
           System.out.println();
           System.out.println("**************** Hey Admin !!!! ****************");
           System.out.println();
-          System.out.println("\n1. ADD MENU ITEM\n2. VIEW ORDERS\n3. UPDATE ITEM\n4. DELETE ITEM\n5. SHOW MENU\n6. EXIT");
+          System.out.println("\n1. ADD MENU ITEM\n2. VIEW ORDERS\n3. UPDATE ITEM RATE\n4. DELETE ITEM\n5. SHOW MENU\n6. EXIT");
           System.out.println("----------------------------");
           System.out.println("      Choose an option      ");
           System.out.println("----------------------------");
@@ -172,24 +193,20 @@ public class Admin extends Customer {
                case 2:
                     viewOrder();
                     showAdminHome();
-
                     break;
                case 3:
                     showMenu("Hello Admin");
                     rateUpdate();
                     showAdminHome();
-
                     break;
                case 4:
                     showMenu("Hello Admin");
                     deleteItem();
                     showAdminHome();
-
                     break;
                case 5:
                     showMenu("Hello Admin");
                     showAdminHome();
-
                     break;
                case 6:
                     System.out.println("Logout Successfully...!");
